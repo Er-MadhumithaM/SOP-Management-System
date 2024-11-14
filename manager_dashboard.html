@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOP Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="images/hti-logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css" integrity="sha384-NvKbDTEnL+A8F/AA5Tc5kmMLSJHUO868P+lDtTpJIeQdGYaUIuLr4lVGOEA1OcMy" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: Poppins, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .menu-bar {
+            background-color: #005BAB;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-bar-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-bar img {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+
+        .menu-bar h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .menu-bar h3 {
+            font-size: 1rem;
+            margin: 0;
+            padding-left: 10px;
+        }
+
+        .menu-icon {
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+            margin-left:20px;
+        }
+
+        .menu-right {
+            display: flex;
+            align-items: center;
+            right: 140px;
+            top: -24px;
+            gap: 15px;
+        }
+     
+        .sidebar {
+            width: 150px;
+            background-color: #f4f4f4;
+            height: 100%;
+            position: fixed;
+            top:80px;
+            left: -150px;
+            padding-top: 70px;
+            transition: left 0.3s ease;
+            z-index: 1;
+            list-style-type: none;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .main {
+            margin-top: 90px;
+            padding: 0;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .main.sidebar-open {
+            margin-left: 150px;
+        }
+
+        .footer-div {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .foot-item {
+            flex: 1;
+            padding: 10px;   
+        }
+
+        .foot-item h2, .foot-item address {
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        .foot-item img {   
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+            margin-left: 50px;
+        }
+
+        table {
+            width: 95%;
+            margin: 20px 0;
+            table-layout: fixed;
+            font-size: 1em;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        thead th {
+            background-color: #f2f2f2;
+            height: 50px;
+        }
+
+        tbody {
+            display: block;
+            height: 360px;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        thead, tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+       
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="submit"] { 
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #logoutBtn {
+            position: relative; 
+            background: none; 
+            border: none;
+            color: white; 
+            cursor: pointer; 
+            font-size: 28px;
+        }
+
+        .disabled {
+            background-color: #f2f2f2;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .disabled input, .disabled button {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        #notificationBtn {
+            position: relative;
+            background: none;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 23px;
+        }
+
+        #notificationModal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            transition-timing-function: ease-in-out;
+            z-index: 500;
+        }
+
+        #notificationContent {
+            width: 50%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .notification-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .badge {
+            background-color: red;
+            width: 15px;
+            height: 15px;
+            margin-left: 5px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: block;
+            color: white;
+            top: -5px;
+            right: -4px;
+            position: absolute;
+        }
+
+        #notificationList {
+            list-style-type: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #notificationList li {
+            padding: 10px;
+            margin-left: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        #notificationList li.unread {
+            background-color: lightgray;
+            font-weight: bold;
+        }
+
+        #notificationList li.read {
+            background-color: white;
+            font-weight: normal;
+        }
+
+        #notificationList li:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .notification-message {
+            flex-grow: 1;
+        }
+
+        .notification-timestamp {
+            font-size: 0.85em;
+            color: gray;
+            margin-left: 10px;
+        }
+        button#helpBtn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .required {
+            color: red;
+            font-weight: bold;
+        }
+
+        #helpModal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            padding-top: 60px; 
+            left: 0;
+            top: 0;                                                                                         
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        #helpContent {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 10px;
+        }
+
+        .qform {
+            max-width: 300px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .qform .userParagraph {
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .queries form {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-left: 105px;
+        }
+
+        .queries textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+
+        .queries label {
+            text-align: right;
+            margin-left: auto;
+        }
+
+        .queries input[type="text"], .queries textarea {
+            width: 60%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .queries input[type="submit"] {
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .queries input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .queries {
+            margin-left: 50px;
+        }
+
+        .hemail{
+            width: 90%;
+            margin-left: 25px;
+        }
+
+        .sidebar .profile-section {
+            text-align: center;
+            padding: 10px;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .sidebar .profile-section img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .sidebar .profile-section p {
+            font-size: 1.2em;
+            margin: 0;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        button#taskBtn {
+	        background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        #taskModal {
+            display: none; 
+            position: fixed; 
+            z-index: 90; 
+            padding-top: 60px; 
+            left: 0;
+            top: 0;                                                                                          
+            width: 100%; 
+            height: 100%;
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        #taskContent {
+            background-color: #fff;
+            color: black;
+            margin: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 1200px;
+            height: 600px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            border-radius: 10px;
+        }
+
+        .assign-process-container {
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 10px;
+            color: #000;
+        }
+
+        .assign-task-form {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-left: 105px;
+        }
+
+        .assign-task-form label {
+            text-align: right;
+            margin-left: auto;
+        }
+
+        .assign-task-form select, .assign-task-form input {
+            width: 60%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .TaskSubmit-btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            position: relative;
+            left: 320px;
+            margin-top: 20px;
+        }
+
+        .TaskSubmit-btn:hover {
+            background-color: #45a049;
+        }
+
+        button#addTaskBtn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        #addTaskModal {
+            display: none; 
+            position: fixed; 
+            z-index: 80; 
+            padding-top: 60px; 
+            left: 0;
+            top: 0;                                                                                         
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        #addTaskContent {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 10px;
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+            float: right;
+            right: 55px;
+            bottom: 9px;
+        }
+
+        .search-wrapper {
+            display: flex;
+        }
+
+        .search-wrapper input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .filter-icon {
+            background-color: #005BAB;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-icon:hover {
+            background-color: #003d73;
+        }
+
+        .filter-options, .status-options {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 1000;
+            width: 250px;
+        }
+
+        .filter-options label, .status-options label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-bar">
+        <span class="menu-icon" onclick="toggleSidebar()">&#9776;</span>
+        <div class="menu-bar-content">
+            <img src="images/hti-logo.png" alt="Logo">
+            <div>
+                <h1 style="font-size: 50px; padding: 10px; margin: 0;padding-top: 10px;">Hirotec.ism</h1>
+                <h3 style="font-size: 20px; padding-bottom: 20px; margin-bottom: 10px;"><bold>SINCERITY - MODESTY - PROGRESS</bold></h3>
+            </div>
+        </div>
+
+        <div class="menu-right">
+            <!-- Add Task Button -->
+            <button id="addTaskBtn"><i class="bi bi-plus-circle"></i></button>
+            <div id="addTaskModal" class="modal">
+                <div id="addTaskContent" class="modal-content">
+                    <span class="close" id="closeAddTaskModal">&times;</span>
+
+                    <!-- Manager's Task assignment form -->
+                    <div class="assign-process-container">
+                        <h2>Assign Process to Employee</h2>
+                        <form id="assignTaskForm" class="assign-task-form">
+                            <label for="employeeID">Select Employee: <span class="required">*</span></label>
+                            <select id="employeeID" required>
+                                <option value="" disabled selected>-- Choose Employee --</option>
+                                <option value="22423">22423 - Meenu (Employee)</option>
+                                <option value="22424">22424 - Kumar (Employee)</option>
+                            </select>
+
+                            <label for="taskTitle">Project ID: <span class="required">*</span></label>
+                            <input type="text" id="taskTitle" required>
+
+                            <label for="taskDescription">Description:</label>
+                            <input type="text" id="taskDescription">
+                            
+                            <label for="startDate">Start Date: <span class="required">*</span></label>
+                            <input type="date" id="startDate" required>
+
+                            <label for="dueDate">Due Date: <span class="required">*</span></label>
+                            <input type="date" id="dueDate" required>
+
+                            <label for="priority">Priority Level: <span class="required">*</span></label>
+                            <select id="priority" required>
+                                <option value="" disabled selected>-- Choose Priority --</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+
+                            <label for="processID">Related Process: <span class="required">*</span></label>
+                            <select id="processID" required>
+                                <option value="" disabled selected>-- Choose Process --</option>
+                                <option value="Process 1">Assembly of a RH Door Fixture</option>
+                                <option value="Process 2">Process 2</option>
+                                <option value="Process 3">Process 3</option>
+                                <option value="Process 4">Process 4</option>
+                                <option value="Process 5">Process 5</option>
+                                <option value="Process 6">Process 6</option>
+                                <option value="Process 7">Process 7</option>
+                                <option value="Process 8">Process 8</option>
+                                <option value="Process 9">Process 9</option>
+                                <option value="Process 10">Process 10</option>
+                                <option value="Process 11">Process 11</option>
+                                <option value="Process 12">Process 12</option>
+                                <option value="Process 13">Process 13</option>
+                                <option value="Process 14">Process 14</option>
+                                <option value="Process 15">Process 15</option>
+                            </select>
+
+                            <label for="comments">Comments:</label>
+                            <input type="text" id="comments" placeholder="Additional notes or comments">
+
+                            <button type="submit" class="TaskSubmit-btn">Assign Task</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Calendar Button -->
+            <button onclick="openTaskModal()" id="taskBtn"><i class="bi bi-calendar2-week"></i></button>
+            <div id="taskModal" class="modal">
+                <div id="taskContent" class="modal-content">
+                    <span class="close" id="closeTask" onclick="closeTaskModal()">&times;</span>
+                    <iframe id="iframeDisplay" src="" width="100%" height="100%" frameborder="0"></iframe>
+                </div>
+            </div>
+            
+            <!-- Help Button -->
+            <button id="helpBtn"><i class="bi bi-question-circle"></i></button>
+            <div id="helpModal" class="modal">
+                <div id="helpContent" class="modal-content">
+                    <span class="close" id="helpClose">&times;</span>
+                    <div class="queries" style="color: black;">
+                        <h2 class="hemail">How can we help you?</h2>
+                        <p class="hemail" style="padding-bottom: 20px;">&nbsp;&ensp;&emsp;&nbsp;&ensp;&emsp;&nbsp;&ensp;If you have any questions, feedbacks or concerns, please don't hesitate to email us. We are always here to help you!</p>
+                        <form id="qform"  method="post" onsubmit="return formSubmit()">
+                            <label class="data" for="empID"><b>Employee ID: <span class="required">*</span></b></label>
+                            <input type="text" id="empID" name="empID" required>
+        
+                            <label class="data" for="userParagraph"><b>Queries: <span class="required">*</span></b></label>
+                            <textarea type="text" id="userParagraph" name="userParagraph"></textarea>
+        
+                            <br>
+                            <input type="submit" value="Submit" style="width: 100px; text-align: center; margin-left: 200px; margin-top: 20px;">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Button -->
+            <button id="notificationBtn">
+                <i class="bi bi-bell" id="notificationIcon"></i>
+                <span class="badge" id="notificationBadge" style="display: none;"><b>0</b></span>
+            </button>
+            
+            <!-- Logout Button -->
+            <button id="logoutBtn" style="margin-right:20px"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <!-- Profile Section -->
+        <div class="profile-section" style="text-align: center; cursor: pointer;">
+            <a href="profile.html" target="_parent" style="text-decoration: none;">
+                <img id="profilePic" class="profile-pic" alt="Profile Picture" style="cursor: pointer;">
+                <b><p id="profile-name" style="text-align: center;"></p></b>
+            </a>            
+        </div>
+
+        <ul style="list-style-type: none; text-decoration: none; color:#005BAB;">
+            <li><a href="home.html" style="color: #005BAB;">Home</a></li>
+            <li><a href="about.html" style="color: #005BAB;">About</a></li>
+		    <li><a href="projects.html" style="color: #005BAB;">Projects</a></li>
+		    <li><a href="testimonials.html" style="color: #005BAB;">Testimonials</a></li>
+            <li><a href="contact.html" style="color: #005BAB;">Contact</a></li>
+        </ul>
+    </div>
+
+    <div class="main" style="padding-top: 65px;"><br>
+        <h1><div id="welcome-msg" style="margin-left: 170px;"></div></h1>
+        
+        <div class="process-status" style="padding-left: 170px; margin-top: 30px;">
+           <!-- Assembly Log Section -->
+           <h2>Process Status:</h2>
+
+           <div class="filter-container">
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" placeholder="Search..." />
+                    <span class="filter-icon" id="filterIcon"><i class="bi bi-funnel"></i></span>
+                </div>
+            
+                <!-- Filter Options (Dropdown) -->
+                <div class="filter-options" id="filterOptions" style="display: none;">
+                    <label>
+                        <input type="radio" name="filter" id="filterDate" value="date" /> Filter by Date
+                    </label>
+                    <label>
+                        <input type="radio" name="filter" id="filterPID" value="pid" /> Filter by Process ID
+                    </label>
+                    <button id="applyFilter">Apply Filters</button>
+                </div>
+            </div>
+           
+            <!-- Assembly Log Table -->
+            <table id="managerTable">
+                <thead>
+                    <tr>
+                        <th>Emp ID</th>
+                        <th>Date</th>
+                        <th>Process ID</th>
+                        <th>Process Name</th>
+                        <th>Status</th>
+                        <th>Step No.</th>
+                        <th>Issues</th>
+                        <th>Approval Status</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="managerTableBody">
+                    <!-- Employee logs will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="notificationModal" class="modal">
+            <div id="notificationContent" class="modal-content">
+                <span class="notification-close">&times;</span>
+                <h3>Notifications</h3>
+                <ul id="notificationList">
+                    <!-- Notifications will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
+        
+        <br><br>
+        <div class="footer-div" style="background-color: #005BAB;">
+            <div class="foot-item">
+                <h2 style="color: white; padding-bottom: 25px; padding-left: 150px; padding-top: 15px;">Follow Us On</h2>
+                <a href="#fb" style="text-decoration: none; padding-left: 150px;color: white; font-size: 30px;"><i class="bi bi-facebook">&ensp;</i></a>
+                <a href="#insta" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-instagram">&ensp;</i></a>
+                <a href="#twitter" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-twitter">&ensp;</i></a>
+                <a href="#linkedin" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-linkedin">&ensp;</i></a>
+                <a href="#mail" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-envelope">&ensp;</i></a>
+            </div>
+
+            <div class="foot-item" style="display: flex; align-items: center;">
+                <img src="images/hti-logo.png" style="width: 50px; height: 50px; padding: 0; margin-right: 20px; position: relative; left: 180px; bottom: 45px;" alt="Logo">
+                <address style="text-align: left; margin-left: 10px; position: relative; left: 160px; color: white;">
+                    <h2 style="text-align: left; font-style: normal; font-size: 35px;">Hirotec India Pvt. Ltd.,</h2>
+                    <br>&ensp;&ensp;&ensp;&ensp;&ensp;# 7/147, W Power House Rd, 
+                    <br>&ensp;&ensp;&ensp;&ensp;&ensp;Keeranatham Post, 
+                    <br>&ensp;&ensp;&ensp;&ensp;&ensp;Saravanampatti, 
+                    <br>&ensp;&ensp;&ensp;&ensp;&ensp;Coimbatore, 
+                    <br>&ensp;&ensp;&ensp;&ensp;&ensp;Tamil Nadu.    
+                </address>
+            </div>
+        </div>
+        <div>
+            <p style="text-align: center; background-color: #005BAB; color: #fff; margin-top: 0px; margin-bottom: 0px; padding: 20px;"><small>&copy; 2024 Hirotec India Pvt. Ltd., Coimbatore. 
+            <br>All rights reserved. | <a href="#privacypolicy" style="text-decoration: none; color: #fff;">Privacy Policy</a></small></p>
+            <p style="text-align: center; background-color: #005BAB; color: #fff; margin-top: 0px;"><b>Made with <span style="color: #f44336;">&hearts;</span> in India</b><br><br></p>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+
+    <script>
+        //sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');         
+            sidebar.classList.toggle('active');
+        }
+
+        // Retrieve the employee's name from local storage
+        const employeeName = sessionStorage.getItem('employeeName');
+        const profilePic = sessionStorage.getItem('profilePic');
+
+        document.getElementById('welcome-msg').innerText = employeeName ? `Welcome, ${employeeName}!` : 'Welcome, Guest!';
+
+        // Display employee's profile picture
+        if (profilePic) {
+            document.getElementById('profilePic').src = profilePic;
+        } else {
+            document.getElementById('profilePic').src = 'images/default-profile.png';  // Fallback profile picture
+        }
+        document.getElementById('profile-name').innerText = `${employeeName}`;
+   
+        // Load manager view of all logs
+        document.addEventListener('DOMContentLoaded', function() {
+            const employeeName = sessionStorage.getItem('employeeName');
+
+            if (sessionStorage.getItem('userRole') === 'manager') {
+                document.getElementById('welcome-msg').innerText = employeeName ? `Welcome, ${employeeName}!` : 'Welcome, Guest!';
+
+                // Load and display logs from all employees
+                displayManagerLogs('managerTableBody');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('employeeName');
+            sessionStorage.removeItem('empID');
+            window.location.href = 'SOP_login.html';
+        });
+
+        // Notification management
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationModal = document.getElementById('notificationModal');
+        const closeNotification = document.querySelector('.notification-close');
+        const userID = sessionStorage.getItem('empID'); // Get user ID from session
+
+        // Open notification modal and mark as read
+        notificationBtn.addEventListener('click', function() {
+            notificationModal.style.display = 'flex';
+            markNotificationsAsRead(userID);  // Only mark this user's notifications as read
+            const unreadCount = loadNotifications(userID).filter(notification => !notification.read).length;
+            updateNotificationBadge(unreadCount);  // Update badge count immediately
+            setTimeout(updateNotificationStyles, 3000);
+        });
+
+        // Close notification modal
+        closeNotification.addEventListener('click', function() {
+            notificationModal.style.display = 'none';
+        });
+
+        // Badge update function
+        function updateNotificationBadge(count) {
+            const badge = document.getElementById('notificationBadge');
+            badge.style.display = count > 0 ? 'inline' : 'none';
+            badge.textContent = count;
+        }
+
+        // Display notifications
+        function displayNotifications() {
+            const notifications = loadNotifications(userID);  // Load only this user's notifications
+            const notificationList = document.getElementById('notificationList');
+            notificationList.innerHTML = '';
+
+            notifications.slice().reverse().forEach(notification => {
+                const listItem = document.createElement('li');
+                listItem.className = notification.read ? 'read' : 'unread';
+
+                // Create message and timestamp
+                const messageDiv = document.createElement('span');
+                messageDiv.className = 'notification-message';
+                messageDiv.textContent = notification.message;
+
+                const timestampDiv = document.createElement('span');
+                timestampDiv.className = 'notification-timestamp';
+                timestampDiv.textContent = notification.timestamp;
+
+                listItem.appendChild(messageDiv);
+                listItem.appendChild(timestampDiv);
+                notificationList.insertAdjacentElement('afterbegin', listItem); // Insert each item at the top
+            });
+        }
+
+        // Initialize badge and notifications on load
+        window.onload = function() {
+            const unreadCount = loadNotifications(userID).filter(notification => !notification.read).length;
+            updateNotificationBadge(unreadCount);
+            displayNotifications();
+        };
+
+        // Function to update the notification styles after marking them as read
+        function updateNotificationStyles() {
+            const unreadNotifications = document.querySelectorAll('#notificationList li.unread');
+            unreadNotifications.forEach(notification => {
+                notification.classList.remove('unread');
+                notification.classList.add('read');
+            });
+        }
+
+        // Get modal element and close button
+        const helpModal = document.getElementById('helpModal');
+        const closeModalBtn = document.getElementById('helpClose');
+
+        // When the help button is clicked, open the modal
+        document.getElementById('helpBtn').onclick = function() {
+            helpModal.style.display = 'block';
+        }
+
+        // When the close button is clicked, close the modal
+        closeModalBtn.onclick = function() {
+            helpModal.style.display = 'none';
+        }
+
+        // When the user clicks anywhere outside the modal, close it
+        window.onclick = function(event) {
+            if (event.target == helpModal) {
+                helpModal.style.display = 'none';
+            }
+        }
+        
+        function formSubmit() {
+            function validateForm() {
+
+                document.getElementById('qform').addEventListener('keydown', function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                });
+
+                var empID = document.getElementById("empID").value;
+                var userParagraph = document.getElementById("userParagraph").value;
+
+                if (isNaN(empID) || empID.trim() === "") {
+                    alert("Please enter a valid employee number.");
+                    return false;
+                }   
+                if (userParagraph.trim() === "" || userParagraph.length < 5) {
+                    alert("Please enter your query or feedback. It must be atleast 5 characters long.");
+                    return false;
+                }
+                return true;
+            }
+            if (!validateForm()) {
+                return false;
+            }
+
+            const qEmpID = document.getElementById('empID').value;
+            const qmessage = document.getElementById('userParagraph').value;
+
+            const emailBody= `
+                Employee ID: ${qEmpID}, 
+                Queries: ${qmessage}`;
+
+            var formattedBody = emailBody;
+            var mailToLink = "https://mail.google.com/mail/?view=cm&fs=1&to=madhumaruthu369@gmail.com&su=Form Submission&body=" + encodeURIComponent(formattedBody);
+            window.location.href = mailToLink;
+
+            return false;
+        }
+
+        function openTaskModal() {
+            var modal = document.getElementById("taskModal");
+            var iframe = document.getElementById("iframeDisplay");
+            iframe.src = "taskCalendar.html";  // Change URL to desired page
+            modal.style.display = "block";
+        }
+
+        // Close the modal
+        function closeTaskModal() {
+            var modal = document.getElementById("taskModal");
+            modal.style.display = "none";
+            var iframe = document.getElementById("iframeDisplay");
+            iframe.src = "";
+        }
+
+        // When the user clicks anywhere outside the modal, close it
+        window.onclick = function(event) {
+            if (event.target == taskModal) {
+                taskModal.style.display = 'none';
+            }
+        }
+
+        // Open the Add Task Modal
+        document.getElementById('addTaskBtn').addEventListener('click', function() {
+            document.getElementById('addTaskModal').style.display = 'block';
+        });
+
+        // Close the Add Task Modal
+        document.getElementById('closeAddTaskModal').addEventListener('click', function() {
+            document.getElementById('addTaskModal').style.display = 'none';
+        });
+
+        document.getElementById('assignTaskForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const employeeID = document.getElementById('employeeID').value;
+            const taskTitle = document.getElementById('taskTitle').value;
+            const taskDescription = document.getElementById('taskDescription').value || 'None';
+            const dueDate = document.getElementById('dueDate').value;
+            const priority = document.getElementById('priority').value;
+            const processID = document.getElementById('processID').value;
+            const comments = document.getElementById('comments').value || 'None';
+            const startDate = document.getElementById('startDate').value;
+
+            // Get managerID from session
+            const managerID = sessionStorage.getItem('empID'); // Current logged-in manager's ID
+
+            if (!employeeID || !taskTitle || !dueDate || !startDate || !priority || !processID) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+
+            // Save task in localStorage
+            let storedData = JSON.parse(localStorage.getItem('assignedProcesses')) || {};
+            let assignedProcesses = storedData.assignedProcesses ? JSON.parse(storedData.assignedProcesses) : {};
+
+            // Ensure it's an array of tasks for each employee
+            if (!assignedProcesses[employeeID]) {
+                assignedProcesses[employeeID] = [];
+            }
+
+            assignedProcesses[employeeID].push({
+                managerID: managerID, // Add manager ID to task
+                taskTitle: taskTitle,
+                taskDescription: taskDescription,
+                dueDate: dueDate,
+                priority: priority,
+                processID: processID,
+                comments: comments,
+                startDate: startDate,
+                completed: false  // Initially mark as not completed
+            });
+
+            document.getElementById('assignTaskForm').reset();
+
+            // Save back to localStorage
+            storedData.assignedProcesses = JSON.stringify(assignedProcesses);
+            localStorage.setItem('assignedProcesses', JSON.stringify(storedData));
+
+            // Notify the assigned employee
+            addNotification(employeeID, `You have been assigned a new task: ${taskTitle}`);
+
+            alert('Task added successfully!');
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterIcon = document.getElementById('filterIcon');
+            const filterOptions = document.getElementById('filterOptions');
+            const applyFilterBtn = document.getElementById('applyFilter');
+            const searchInput = document.getElementById('searchInput');
+            const filterDate = document.getElementById('filterDate');
+            const filterPID = document.getElementById('filterPID');
+            const logTable = document.getElementById('managerTable');
+            const rows = logTable.getElementsByTagName('tr');
+
+            filterIcon.addEventListener('click', function () {
+                filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
+            });
+
+            applyFilterBtn.addEventListener('click', function () {
+                const searchValue = searchInput.value.trim().toLowerCase();
+                const isFilterByDate = filterDate.checked;
+                const isFilterByPID = filterPID.checked;
+                let hasVisibleRow = false;
+
+                for (let i = 1; i < rows.length; i++) {
+                    let dateCell = rows[i].getElementsByTagName('td')[1];
+                    let pidCell = rows[i].getElementsByTagName('td')[2];
+                    let showRow = true;
+
+                    if (isFilterByDate && dateCell && !dateCell.textContent.toLowerCase().includes(searchValue)) {
+                        showRow = false;
+                    }
+
+                    if (isFilterByPID && pidCell && !pidCell.textContent.toLowerCase().includes(searchValue)) {
+                        showRow = false;
+                    }
+
+                    if (showRow) {
+                        rows[i].style.display = '';
+                        rows[i].style.backgroundColor = '#fffadf';
+                        hasVisibleRow = true;
+                    } else {
+                        rows[i].style.display = 'none';
+                        rows[i].style.backgroundColor = '';
+                    }
+                }
+
+                if (!hasVisibleRow) {
+                    alert('No logs match the selected filter criteria.');
+                    for (let i = 1; i < rows.length; i++) {
+                        rows[i].style.display = '';
+                        rows[i].style.backgroundColor = '';
+                    }
+                }
+                filterOptions.style.display = 'none';
+                searchInput.value = '';
+            });
+        });
+    </script>
+</body>
+</html>

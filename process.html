@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOP Process</title>
+    <link rel="icon" type="image/x-icon" href="images/hti-logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css" integrity="sha384-NvKbDTEnL+A8F/AA5Tc5kmMLSJHUO868P+lDtTpJIeQdGYaUIuLr4lVGOEA1OcMy" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            font-family: Poppins, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+        }
+
+        .menu-bar {
+            background-color: #005BAB;
+            color: white;
+            padding: 5px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-bar-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .menu-bar img {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+
+        .menu-bar h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .menu-bar h3 {
+            font-size: 1rem;
+            margin: 0;
+            padding-left: 10px;
+        }
+
+        .menu-icon {
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+            margin-left:50px;
+        }
+
+        .menu-right {
+            display: flex;
+            align-items: center;
+            right: 140px;
+            top: -24px;
+            gap: 15px;
+        }
+     
+        .main {
+            margin-top: 90px;
+            padding: 0;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="button"] {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        .footer-div {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .foot-item {
+            flex: 1;
+            padding: 10px;   
+        }
+
+        .foot-item h2, .foot-item address {
+            margin: 0;
+            padding: 0;
+            display: block;            
+        }
+
+        .foot-item img {   
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+            margin-left: 50px;
+        }
+
+        .done-step:disabled {
+            background-color: #d3d3d3;
+            color: #fff;
+            cursor: not-allowed;
+        }
+        
+        .done-step:disabled:hover {
+            background-color: #d3d3d3;
+        }
+
+        .sidebar {
+            width: 200px;
+            height: 78%;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+            overflow-y: scroll;
+        }
+
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .step {
+            line-height: 30px;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin: 10px 0;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            width: 30px;
+            height: 30px;
+        }
+
+        .step.visited {
+            background-color: orange;
+            color: white;
+        }
+
+        .step.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .step.not-visited {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .step:hover {
+            cursor: pointer;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        button, input[type="submit"] {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        button#helpBtn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        #helpModal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            padding-top: 60px; 
+            left: 0;
+            top: 0;                                                                                         
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        #helpContent {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form {
+            max-width: 300px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .form .userParagraph {
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-left: 105px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+
+        label {
+            text-align: right;
+            margin-left: auto;
+        }
+
+        input[type="text"], textarea {
+            width: 60%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .queries {
+            margin-left: 50px;
+        }
+
+        .hemail{
+            width: 90%;
+            margin-left: 25px;
+            text-align: center;
+        }
+
+        .required {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-bar">
+        <span class="menu-icon" onclick="return redirectToDashboard()"><i class="bi bi-house"></i></span>
+
+        <div class="menu-bar-content">
+            <img src="images/hti-logo.png" alt="Logo">
+            <div>
+                <h1 style="font-size: 50px; padding: 10px; margin: 0; padding-top: 10px; text-align: center;">Hirotec.ism</h1>
+                <h3 style="font-size: 20px; padding-bottom: 20px; margin-bottom: 10px;"><bold>SINCERITY - MODESTY - PROGRESS</bold></h3>
+    
+            </div>
+        </div> 
+        <div class="menu-right">            
+            <button id="helpBtn"><i class="bi bi-question-circle"></i></button>
+
+            <div id="helpModal" class="modal">
+                <div id="helpContent" class="modal-content">
+                    <span class="close">&times;</span>
+                    <div class="queries" style="color: black;">
+                        <h2 class="hemail">How can we help you?</h2>
+                        <p class="hemail" style="padding-bottom: 20px;">&nbsp;&ensp;&emsp;&nbsp;&ensp;&emsp;&nbsp;&ensp;If you have any questions, feedbacks or concerns, please don't hesitate to email us. We are always here to help you!</p>
+                        <form id="qform"  method="post" onsubmit="return formSubmit()">
+                            <label class="data" for="empID"><b>Employee ID: <span class="required">*</span></b></label>
+                            <input type="text" id="empID" name="empID" required>
+        
+                            <label class="data" for="userParagraph"><b>Queries: <span class="required">*</span></b></label>
+                            <textarea type="text" id="userParagraph" name="userParagraph" ></textarea>
+        
+                            <br>
+                            <input type="submit" value="Submit" style="width: 100px; text-align: center; margin-left: 200px; margin-top: 20px;">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>   
+    </div>
+
+    <div class="sidebar" style="margin-top: 142px; margin-bottom: 0;">
+        <h2>Progress Status</h2>
+        <div id="progress-container" class="progress-container">
+            <!-- Steps will be dynamically generated here -->
+        </div>
+    </div>
+
+    <div class="main" style="padding-top: 55px; margin-left: 70px;">
+        <div class="ins-div" style="padding-left: 10px;">
+            <h1 id="process-title">Process Instructions</h1>
+            <div id="instruction-step">
+                <!-- Current instruction and video will be displayed here -->
+            </div>
+
+            <div class="button-container" style="gap: 80px;">
+                <input type="button" id="prev-step" value="Previous" style="margin-top: 10px; margin-left: 5px; margin-right: 50px; display: none;">
+                <input type="button" id="next-step" value="Next" style="margin-top: 10px; margin-left: 5px;">
+            </div> 
+        </div> 
+
+        <!--<br><br><br><br><br>
+        <div class="footer-div" style="background-color: #005BAB;">
+            <div class="foot-item">
+                <h2 style="color: white; padding-bottom: 25px; padding-left: 150px; padding-top: 15px;">Follow Us On</h2>
+                <a href="#fb" style="text-decoration: none; padding-left: 150px;color: white; font-size: 30px;"><i class="bi bi-facebook">&ensp;</i></a>
+                <a href="#insta" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-instagram">&ensp;</i></a>
+                <a href="#twitter" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-twitter">&ensp;</i></a>
+                <a href="#linkedin" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-linkedin">&ensp;</i></a>
+                <a href="#mail" style="text-decoration: none; color: white; font-size: 30px;"><i class="bi bi-envelope">&ensp;</i></a>
+            </div>
+
+            <div class="foot-item" style="display: flex; align-items: center;">
+                <img src="images/hti-logo.png" style="width: 50px; height: 50px; padding: 0; margin-right: 20px; position: relative; left: 180px; bottom: 45px;" alt="Logo">
+                <address style="text-align: left; margin-left: 10px; position: relative; left: 160px; color: white;">
+                    <h2 style="text-align: left; font-style: normal; font-size: 35px;">Hirotec India Pvt. Ltd.,</h2>
+                    <br>&ensp;&ensp;&ensp;&ensp;&ensp;# 7/147, W Power House Rd, <br>&ensp;&ensp;&ensp;&ensp;&ensp;Keeranatham Post, <br>&ensp;&ensp;&ensp;&ensp;&ensp;Saravanampatti, <br>&ensp;&ensp;&ensp;&ensp;&ensp;Coimbatore, <br>&ensp;&ensp;&ensp;&ensp;&ensp;Tamil Nadu.
+                        
+                </address>
+            </div>
+        </div>
+        <div>
+            <p style="text-align: center; background-color: #005BAB; color: #fff; margin-top: 0px; margin-bottom: 0px; padding: 20px;"><small>&copy; 2024 Hirotec India Pvt. Ltd., Coimbatore. 
+            <br>All rights reserved. | <a href="#privacypolicy" style="text-decoration: none; color: #fff;">Privacy Policy</a></small></p>
+            <p style="text-align: center; background-color: #005BAB; color: #fff; margin-top: 0px;"><b>Made with <span style="color: #f44336;">&hearts;</span> in India</b><br><br></p>
+        </div>
+        -->
+    </div>
+    <script> 
+        const urlParams = new URLSearchParams(window.location.search);
+        const process = urlParams.get('process');
+        
+        const processInstructions = {
+            'Process 1': [
+                { text: 'Step - 1:  Verify that all components (base frame, panels, fasteners) are present and free of damage.', video: 'videos/process1_step1.mp4' },
+                { text: 'Step - 2: Clean the work table and ensure it is stable and level.', video: 'videos/process1_step2.mp4' },
+                { text: 'Step - 3: Review the assembly drawing for the RH Door Fixture.', video: 'videos/process1_step3.mp4' },
+                { text: 'Step - 4: Carefully lift the base frame and place it on the work table.', video: 'videos/process1_step4.mp4' },
+                { text: 'Step - 5: Ensure that the base frame is oriented correctly according to the reference drawing.', video: 'videos/process1_step5.mp4' },
+                { text: 'Step - 6: Align Panel1 with the designated position on the base frame.', video: 'videos/process1_step6.mp4' },
+                { text: 'Step - 7: Ensure that all alignment points match the reference drawing.', video: 'videos/process1_step7.mp4' },
+                { text: 'Step - 8: Verify that Panel1 is securely positioned before proceeding.', video: 'videos/process1_step8.mp4' },
+                { text: 'Step - 9: Position Panel2 on the base frame next to Panel1.', video: 'videos/process1_step9.mp4' },
+                { text: 'Step - 10: Ensure that the edges of Panel1 and Panel2 are flush and properly aligned.', video: 'videos/process1_step10.mp4' },
+                { text: 'Step - 11: Check for any gaps or misalignment and correct as needed.', video: 'videos/process1_step11.mp4' },
+                { text: 'Step - 12: Identify Area 1 and Hole number 25 on the base frame.', video: 'videos/process1_step12.mp4' },
+                { text: 'Step - 13: Insert the fastener into Hole 25 using the specified tool (e.g., screwdriver or Allen key).', video: 'videos/process1_step13.mp4' },
+                { text: 'Step - 14: Tighten the fastener to the specified torque value using a torque wrench.', video: 'videos/process1_step14.mp4' },
+                { text: 'Step - 15: Repeat the fastening process for any additional fasteners required in this area as per the reference drawing.', video: 'videos/process1_step15.mp4' },
+                { text: 'Step - 16: Verify that all components are properly secured and aligned.', video: 'videos/process1_step16.mp4' },
+                { text: 'Step - 17: Check the torque values of all fasteners to ensure they meet the specified requirements.', video: 'videos/process1_step17.mp4' },
+                { text: 'Step - 18: Inspect the assembly for any visible defects or misalignments.', video: 'videos/process1_step18.mp4' },
+                { text: 'Step - 19: The Quality Inspector should perform a final inspection of the assembled RH Door Fixture.', video: 'videos/process1_step19.mp4' },
+                { text: 'Step - 20: Document any observations and sign off on the inspection report.', video: 'videos/process1_step20.mp4' }
+
+            ],
+            'Process 2': [
+                { text: 'Instruction 1 for Process 2', video: 'videos/process2_step1.mp4' },
+                { text: 'Instruction 2 for Process 2', video: 'videos/process2_step2.mp4' },
+                { text: 'Instruction 3 for Process 2', video: 'videos/process2_step3.mp4' }
+            ],
+            'Process 3': [
+                { text: 'Instruction 1 for Process 3', video: 'videos/process3_step1.mp4' },
+                { text: 'Instruction 2 for Process 3', video: 'videos/process3_step2.mp4' },
+                { text: 'Instruction 3 for Process 3', video: 'videos/process3_step3.mp4' }
+            ]
+            // Add more processes as needed
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressContainer = document.getElementById('progress-container');
+            const instructionStepDiv = document.getElementById('instruction-step');
+            const nextButton = document.getElementById('next-step');
+            const prevButton = document.getElementById('prev-step');
+            
+            let currentStep = 0;
+            const steps = processInstructions[process] || [];
+            let completedSteps = new Array(steps.length).fill(false);
+            let visitedSteps = new Array(steps.length).fill(false); // Track which steps have been visited
+
+            // Dynamically create steps
+            function generateSteps(stepCount) {
+                progressContainer.innerHTML = ''; // Clear existing steps
+                for (let i = 0; i < stepCount; i++) {
+                    let stepDiv = document.createElement('div');
+                    stepDiv.classList.add('step', 'not-visited');
+                    stepDiv.setAttribute('data-step', i);
+                    stepDiv.textContent = `${i + 1}`;
+                    progressContainer.appendChild(stepDiv);
+                }
+                bindClickEvents();
+            }
+
+            // Update instruction view
+            function showInstruction(stepNumber) {
+                const currentInstruction = steps[stepNumber];
+                instructionStepDiv.innerHTML = `
+                    <h3>${currentInstruction.text}</h3>
+                    <video width="750" height="360" controls>
+                        <source src="${currentInstruction.video}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div>
+                        <button id="done-step" class="done-step">Done</button>
+                    </div>
+                `;
+
+                const doneButton = document.getElementById('done-step');
+                if (completedSteps[stepNumber]) {
+                    doneButton.disabled = true;
+                }
+
+                doneButton.addEventListener('click', () => {
+                    completedSteps[stepNumber] = true;
+                    doneButton.disabled = true;
+                    updateProgressBar();
+                });
+
+                // Mark the step as visited
+                visitedSteps[stepNumber] = true;
+                updateProgressBar();
+                prevButton.style.display = stepNumber === 0 ? 'none' : 'inline-block';
+                nextButton.value = stepNumber === steps.length - 1 ? 'Finish' : 'Next';
+            }
+
+            // Update progress bar and its states
+            function updateProgressBar() {
+                const stepDivs = document.querySelectorAll('.step');
+                stepDivs.forEach((stepDiv, index) => {
+                    stepDiv.classList.remove('visited', 'completed', 'not-visited');
+                    if (completedSteps[index]) {
+                        stepDiv.classList.add('completed'); // Green if step is completed
+                    } else if (visitedSteps[index]) {
+                        stepDiv.classList.add('visited'); // Orange if step is visited but not completed
+                    } else {
+                        stepDiv.classList.add('not-visited'); // Grey if step is not visited
+                    }
+                });
+            }
+
+            // Bind click events to each step
+            function bindClickEvents() {
+                const stepDivs = document.querySelectorAll('.step');
+                stepDivs.forEach(stepDiv => {
+                    stepDiv.addEventListener('click', function() {
+                        currentStep = parseInt(this.dataset.step);
+                        showInstruction(currentStep);
+                    });
+                });
+            }
+
+            // Next and Previous button handling
+            nextButton.addEventListener('click', () => {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                } else {
+                    // At the last step, check if all steps are done
+                    if (completedSteps.every(Boolean)) {
+                        if (confirm('Are you sure to finish the process?')) {
+                            alert('Process completed successfully!');
+                            window.location.href = 'employee_dashboard.html'; // Redirect to dashboard
+                        }
+                    } else {
+                        alert('Complete all instructions to finish the process');
+                    }
+                }
+                showInstruction(currentStep);
+            });
+
+            prevButton.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showInstruction(currentStep);
+                }
+            });
+
+            // Initialize the first step and dynamically generate steps
+            generateSteps(steps.length);
+            showInstruction(0); // Initialize the first instruction
+        });
+
+        // Get modal element and close button
+        const helpModal = document.getElementById('helpModal');
+        const closeModalBtn = document.getElementsByClassName('close')[0];
+
+        // When the help button is clicked, open the modal
+        document.getElementById('helpBtn').onclick = function() {
+            helpModal.style.display = 'block';
+        }
+
+        // When the close button is clicked, close the modal
+        closeModalBtn.onclick = function() {
+            helpModal.style.display = 'none';
+        }
+
+        // When the user clicks anywhere outside the modal, close it
+        window.onclick = function(event) {
+            if (event.target == helpModal) {
+                helpModal.style.display = 'none';
+            }
+        }
+        
+        function formSubmit() {
+            function validateForm() {
+                document.getElementById('qform').addEventListener('keydown', function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                }
+                });
+
+                var empID = document.getElementById("empID").value;
+                var userParagraph = document.getElementById("userParagraph").value;
+
+                if (isNaN(empID) || empID.trim() === "") {
+                    alert("Please enter a valid employee number.");
+                    return false;
+                }   
+                if (userParagraph.trim() === "" || userParagraph.length < 5) {
+                    alert("Please enter your query or feedback. It must be atleast 5 characters long.");
+                    return false;
+                }
+                return true;
+            }
+            if (!validateForm()) {
+                return false;
+            }
+
+            const qEmpID = document.getElementById('empID').value;
+            const qmessage = document.getElementById('userParagraph').value;
+
+            const emailBody= `
+                Employee ID: ${qEmpID}, 
+                Queries: ${qmessage}`;
+
+            var formattedBody = emailBody;
+            var mailToLink = "https://mail.google.com/mail/?view=cm&fs=1&to=madhumaruthu369@gmail.com&su=Form Submission&body=" + encodeURIComponent(formattedBody);
+            window.location.href = mailToLink;
+
+            return false;
+        }
+
+        function redirectToDashboard() {
+            const userRole = sessionStorage.getItem('userRole');
+            if (userRole === 'employee') {
+                window.location.href = 'employee_dashboard.html'; // Redirect to employee dashboard
+            } else if (userRole === 'manager') {
+                window.location.href = 'manager_dashboard.html'; // Redirect to manager dashboard
+            } else {
+                alert('Error: User role not found!');
+            }
+        }
+    </script> 
+</body>
+</html>

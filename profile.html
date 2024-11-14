@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTI Contact</title>
+    <link rel="icon" type="image/x-icon" href="images/hti-logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css" integrity="sha384-NvKbDTEnL+A8F/AA5Tc5kmMLSJHUO868P+lDtTpJIeQdGYaUIuLr4lVGOEA1OcMy" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: Poppins, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .menu-bar {
+            background-color: #005BAB;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-bar-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-bar img {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+
+        .menu-bar h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .menu-bar h3 {
+            font-size: 1rem;
+            margin: 0;
+            padding-left: 10px;
+        }
+
+        .menu-icon {
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+            margin-left:50px;
+        }
+
+        .menu-right {
+            display: flex;
+            align-items: center;
+            right: 140px;
+            top: -24px;
+            gap: 15px;
+        }
+     
+        .sidebar {
+            width: 150px;
+            background-color: #f4f4f4;
+            height: 100%;
+            position: fixed;
+            top:80px;
+            left: -150px;
+            padding-top: 70px;
+            transition: left 0.3s ease;
+            z-index: 1;
+            list-style-type: none;
+            text-decoration: none;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .main {
+            margin-top: 90px;
+            padding: 0;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .main.sidebar-open {
+            margin-left: 150px;
+        }
+
+        #logoutBtn {
+            position: relative; 
+            background: none; 
+            border: none;
+            color: white; 
+            cursor: pointer; 
+            font-size: 28px;
+        }
+
+        .info {
+            overflow-y: scroll;
+            height: 400px;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-block {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 80px;
+            margin-left: 35px;
+        }
+
+        .info-block h3 {
+            font-size: 18px;
+            width: 150px;
+            margin: 0;
+        }
+
+        .info-block p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .mycontainer {
+            display: flex;
+            align-items: stretch;
+            gap: 20px;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .mycontainer > div {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+        }
+
+        .mycontainer > .profile-body {
+            flex: 2;
+            overflow-y: scroll;
+            max-height: 500px;
+            max-width: 80%;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .graph-container {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .graph-box {
+            font-weight: bold;
+            font-size: 35px;
+            color: #005BAB;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-bar">
+        <span class="menu-icon" onclick="return redirectToDashboard()"><i class="bi bi-house"></i></span>
+        <div class="menu-bar-content">
+            <img src="images/hti-logo.png" alt="Logo">
+            <div>
+                <h1 style="font-size: 50px; padding: 10px; margin: 0; padding-top: 10px; text-align: center;">Hirotec.ism</h1>
+                <h3 style="font-size: 20px; padding-bottom: 20px; margin-bottom: 10px;"><bold>SINCERITY - MODESTY - PROGRESS</bold></h3>
+            </div>
+        </div>
+        <div class="menu-right">           
+            <button id="logoutBtn" style="margin-right:20px"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </div>
+    
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="home.html" style="color: #2e6aa6;">Home</a></li>
+            <li><a href="about.html" style="color: #2e6aa6;">About</a></li>
+		    <li><a href="projects.html" style="color: #2e6aa6;">Projects</a></li>
+		    <li><a href="testimonials.html" style="color: #2e6aa6;">Testimonials</a></li>
+            <li><a href="contact.html" style="color: #2e6aa6;">Contact</a></li>
+        </ul>
+    </div>
+
+    <div class="main" style="padding-top: 25px;">
+	    <h1 style="margin-left: 90px; padding-top: 25px; font-size: 32px;">User Profile</h1>
+        <div class="mycontainer">
+            <div class="basic-info" style="margin-left: 50px; height: 400px; max-width: 100px;">
+		        <img id="profilePic" class="profile-pic" alt="Profile Picture" style="border-radius: 50%; width: 150px; left: 28px; margin-top: 15px; position: relative;">
+                <h2 id="employeeName" style="font-size: 22px; color: #000; text-align: center;"></h2>
+                <p id="empIDNo" style="text-align: center;"></p>
+                <p id="userRole" style="text-align: center;"></p>          
+	        </div>
+
+            <div class="info">
+                <div class="profile-body"style="margin-left: 40px;">
+                    <h2 style="font-size: 24px; left: 200px;">Personal Info</h2>
+                    <div class="personal-info">
+                        <div class="info-block">
+                            <h3>Full Name</h3>
+                            <p id="nameField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Employee ID</h3>
+                            <p id="IDField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Designation</h3>
+                            <p id="roleField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Department</h3>
+                            <p id="deptField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Email</h3>
+                            <p id="emailField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Phone</h3>
+                            <p id="phoneField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Marital Status</h3>
+                            <p id="maritalField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Gender</h3>
+                            <p id="genderField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Date Of Birth</h3>
+                            <p id="dobField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Blood Group</h3>
+                            <p id="bloodField"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Address</h3>
+                            <p id="addressField"></p>
+                        </div>
+                    </div>	
+                    <br><hr>
+
+                    <h2 style="font-size: 24px; left: 200px;">Professional Info</h2>
+
+                    <div class="personal-info2">
+                        <div class="info-block">
+                            <h3>Supervisor</h3>
+                            <p id="supervisor"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Start Date</h3>
+                            <p id="joiningDate"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Work Location</h3>
+                            <p id="workLocation"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Salary</h3>
+                            <p id="salary"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Educational Qualification</h3>
+                            <p id="eduQual"></p>
+                        </div>
+                        <div class="info-block">
+                            <h3>Phone</h3>
+                            <p id="phoneField"></p>
+                        </div>
+                        
+                        <div class="info-block">
+                            <h3>Address</h3>
+                            <p id="addressField"></p>
+                        </div>
+                    </div>	
+                </div>	
+	        </div>
+            <div class="graphs" style="max-width: 100px;; margin-right: 30px;">
+                    <div class="graph-container">
+                        <h2 style="font-size: 24px;">Years Completed</h2>
+                        <div class="graph-box" id="yearsCompleted">0.0</div>
+                    </div><br><br><br>
+                    <div class="graph-container">
+                        <h2 style="font-size: 24px;">Lorem</h2>
+                        <div class="graph-box" id="yearsCompleted">0.0</div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+	<script>
+        // Fetch user data from sessionStorage
+        const empID = sessionStorage.getItem('empID');
+        const employeeName = sessionStorage.getItem('employeeName');
+        const userRole = sessionStorage.getItem('userRole');
+        const profilePic = sessionStorage.getItem('profilePic');
+        const empEmail = sessionStorage.getItem('empEmail');
+        const phone = sessionStorage.getItem('phone');
+        const dept = sessionStorage.getItem('dept');
+        const address = sessionStorage.getItem('address');
+        const maritalStatus = sessionStorage.getItem('maritalStatus');
+        const gender = sessionStorage.getItem('gender');
+        const dob = sessionStorage.getItem('dob');
+        const blood = sessionStorage.getItem('blood');
+        const supervisor = sessionStorage.getItem('supervisor');
+        const doj = sessionStorage.getItem('doj');
+        const workLocation = sessionStorage.getItem('workLocation');
+        const eduQual = sessionStorage.getItem('eduQual');
+        const salary = sessionStorage.getItem('salary');
+
+        // Display employee's profile picture
+        if (profilePic) {
+            document.getElementById('profilePic').src = profilePic;
+        } else {
+            document.getElementById('profilePic').src = 'images/default-profile.png';  // Fallback profile picture
+        }
+
+        document.getElementById('employeeName').innerText = employeeName;
+        document.getElementById('userRole').innerText = (userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase());
+        document.getElementById('empIDNo').innerText = empID;
+
+        document.getElementById('nameField').innerText = employeeName;
+        document.getElementById('IDField').innerText = empID;
+        document.getElementById('roleField').innerText = (userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase());
+        document.getElementById('deptField').innerText = dept;
+        document.getElementById('phoneField').innerText = phone;
+        document.getElementById('emailField').innerText = empEmail;
+        document.getElementById('addressField').innerText = address;
+        document.getElementById('maritalField').innerText = maritalStatus;
+        document.getElementById('genderField').innerText = gender;
+        document.getElementById('dobField').innerText = dob;
+        document.getElementById('bloodField').innerText = blood;
+        document.getElementById('supervisor').innerText = supervisor;
+        document.getElementById('joiningDate').innerText = doj;
+        document.getElementById('workLocation').innerText = workLocation;
+        document.getElementById('eduQual').innerText = eduQual;
+        document.getElementById('salary').innerText = salary;
+       
+        function redirectToDashboard() {
+            const userRole = sessionStorage.getItem('userRole');
+            if (userRole === 'employee') {
+                window.location.href = 'employee_dashboard.html'; // Redirect to employee dashboard
+            } else if (userRole === 'manager') {
+                window.location.href = 'manager_dashboard.html'; // Redirect to manager dashboard
+            } else {
+                alert('Error: User role not found!');
+            }
+        }
+
+        // Function to calculate years based on months
+        function calculateYears(joiningDate) {
+            const currentDate = new Date();
+            const joinDate = new Date(joiningDate);
+
+            // Calculate difference in years and months
+            const years = currentDate.getFullYear() - joinDate.getFullYear();
+            const months = currentDate.getMonth() - joinDate.getMonth();
+
+            // Calculate total months completed
+            const totalMonths = (years * 12) + months;
+
+            // Return the total in years, rounded to one decimal place
+            return (totalMonths / 12).toFixed(1);
+        }
+
+        // Set the joining date and calculate the years completed
+        const joiningDateText = document.getElementById("joiningDate").textContent;
+        const yearsCompleted = calculateYears(joiningDateText);
+
+        // Update the UI with the years completed
+        document.getElementById("yearsCompleted").textContent = yearsCompleted > 0 ? yearsCompleted : "0.0";
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('employeeName');
+            sessionStorage.removeItem('empID');
+            window.location.href = 'SOP_login.html';
+        });
+    </script>   
+</body>
+</html>
