@@ -1,4 +1,4 @@
-**SOP Management and Task Assignment System**
+# SOP Management and Task Assignment System
 
 The SOP Management and Task Assignment System is a prototype website developed to optimize task tracking, SOP adherence, and task assignment processes within the company. Built with HTML, CSS, and JavaScript, this project aims to improve task tracking, employee guidance, and supervisor monitoring, ultimately enhancing productivity and safety in the workplace. This platform is designed to enhance the efficiency of manufacturing operations and communication between employees and managers.
 
