@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <style>
+        #calendar {
+            max-height: 500px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #taskModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fffadf;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 500px;
+        }
+
+        #taskModal button {
+            margin-top: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #modalOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .taskBtn {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 10px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Assigned Tasks</h2>
+    <div id='calendar'></div>
+
+    <!-- Modal for task details -->
+    <div id="modalOverlay"></div>
+    <div id="taskModal">
+        <span class="close" id="modalClose">&times;</span>
+        <div id="taskDetails"></div>
+        <div class="taskBtn">
+            <button id="startTaskButton">Start Task</button>
+            <button id="markCompletedButton">Mark as Completed</button>
+            <button id="addAssemblyLogButton">Add Assembly Log</button>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const userType = sessionStorage.getItem('userRole'); // "employee" or "manager"
+            const employeeID = sessionStorage.getItem('empID');  // Employee ID (for employee)
+            const managerID = sessionStorage.getItem('empID'); // Manager ID (for manager)
+
+            const storedData = JSON.parse(localStorage.getItem('assignedProcesses')) || {};
+            const assignedProcesses = storedData.assignedProcesses ? JSON.parse(storedData.assignedProcesses) : {};
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [],
+                eventClick: function(info) {
+                    const taskDetails = info.event.extendedProps;
+                    showModal(taskDetails);
+                }
+            });
+
+            function loadEventsForCalendar() {
+                if (userType === 'employee') {
+                    if (assignedProcesses[employeeID]) {
+                        assignedProcesses[employeeID].forEach(task => {
+                            calendar.addEvent({
+                                title: `Task ${task.taskTitle} Assigned`,
+                                start: task.startDate,
+                                color: task.completed ? 'green' : 'blue',
+                                extendedProps: { ...task, employeeID: employeeID }
+                            });
+                        });
+                    }
+                } else if (userType === 'manager') {
+                    Object.keys(assignedProcesses).forEach(empID => {
+                        assignedProcesses[empID].forEach(task => {
+                           if (task.managerID === managerID) {
+                                calendar.addEvent({
+                                    title: `Task ${task.taskTitle} for ${empID}`,
+                                    start: task.startDate,
+                                    color: task.completed ? 'green' : 'blue',
+                                    extendedProps: { ...task, employeeID: empID }
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+
+            function showModal(taskDetails) {
+                document.getElementById('taskDetails').innerHTML = `
+                    <p><strong>Project ID:</strong> ${taskDetails.taskTitle}</p>
+                    <p><strong>Description:</strong> ${taskDetails.taskDescription}</p>
+                    <p><strong>Related Process:</strong> ${taskDetails.processID}</p>
+                    <p><strong>Start Date:</strong> ${taskDetails.startDate}</p>
+                    <p><strong>Due Date:</strong> ${taskDetails.dueDate}</p>
+                    <p><strong>Priority:</strong> ${taskDetails.priority}</p>
+                    <p><strong>Completed:</strong> ${taskDetails.completed ? 'Yes' : 'No'}</p>
+                `;
+
+                document.getElementById('markCompletedButton').style.display = userType === 'employee' && !taskDetails.completed ? 'block' : 'none';
+                document.getElementById('startTaskButton').style.display = userType === 'employee' ? 'block' : 'none';
+                document.getElementById('addAssemblyLogButton').style.display = userType === 'employee' ? 'block' : 'none';
+
+
+                document.getElementById('startTaskButton').onclick = () => {
+                    const goToProcess = confirm("Do you want to start this task?");
+                    if (goToProcess) {
+                        window.parent.location.href = `process.html?process=${taskDetails.processID}`;
+                    }
+                };
+
+                document.getElementById('modalClose').onclick = function() {
+                    closeModal();
+                };
+
+                document.getElementById('addAssemblyLogButton').addEventListener('click', function() {
+                    const projectID = taskDetails.taskTitle;
+                    const pName = taskDetails.processID;
+                    window.parent.location.href = `employee_dashboard.html?openModal=true&projectID=${taskDetails.taskTitle}&pName=${encodeURIComponent(taskDetails.processID)}`;
+                });
+
+                document.getElementById('markCompletedButton').onclick = () => {
+                    markTaskAsCompleted(taskDetails.processID, taskDetails.employeeID);
+                    closeModal();
+                };
+
+                document.getElementById('modalOverlay').style.display = 'block';
+                document.getElementById('taskModal').style.display = 'block';
+            }
+
+            function closeModal() {
+                document.getElementById('modalOverlay').style.display = 'none';
+                document.getElementById('taskModal').style.display = 'none';
+            }
+
+            function markTaskAsCompleted(processID, employeeID) {
+                const storedData = JSON.parse(localStorage.getItem('assignedProcesses')) || {};
+                const assignedProcesses = storedData.assignedProcesses ? JSON.parse(storedData.assignedProcesses) : {};
+
+                if (assignedProcesses[employeeID]) {
+                    assignedProcesses[employeeID].forEach(task => {
+                        if (task.processID === processID) {
+                            task.completed = true;
+                            // Retrieve the manager ID from the task data
+                            const managerID = task.managerID;
+
+                            // Notify the manager
+                            addNotification(managerID, `Task ${task.taskTitle} has been completed by employee ${employeeID}.`);
+                        }
+                    });
+                    storedData.assignedProcesses = JSON.stringify(assignedProcesses);
+                    localStorage.setItem('assignedProcesses', JSON.stringify(storedData));
+                    location.reload();
+                }
+            }
+
+            loadEventsForCalendar();
+            calendar.render();
+
+            document.querySelectorAll('.fc-event').forEach(event => {
+                event.style.cursor = 'pointer';
+            });
+        });
+    </script>
+</body>
+</html>
